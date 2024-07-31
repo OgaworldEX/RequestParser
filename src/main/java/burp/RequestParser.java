@@ -1,24 +1,24 @@
 package burp;
 
 import burp.api.montoya.MontoyaApi;
+import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.params.HttpParameterType;
-import burp.api.montoya.http.message.params.HttpParameter;
-import burp.api.montoya.http.message.requests.HttpRequest;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class RequestParser {
 
     private final MontoyaApi api;
-    private final HttpRequest targetRequest;
+    private final HttpRequestResponse targetReqRes;
     private final StringBuilder resultString;
 
-    public RequestParser(MontoyaApi api,HttpRequest targetRequest){
+    public RequestParser(MontoyaApi api, HttpRequestResponse targetRequestResponse){
         this.api = api;
-        this.targetRequest = targetRequest;
+        this.targetReqRes = targetRequestResponse;
         resultString = new StringBuilder();
     }
 
@@ -34,17 +34,22 @@ public class RequestParser {
     }
 
     private void parseBaseInfo(){
+        resultString.append("\t");
+        if (Objects.nonNull(targetReqRes.annotations().notes())){
+            resultString.append(targetReqRes.annotations().notes().replaceAll("[\n\r]", ""));
+        }
+        resultString.append("\n");
         resultString.append("Method");
         resultString.append("\t");
-        resultString.append(targetRequest.method());
+        resultString.append(targetReqRes.request().method());
         resultString.append("\n");
         resultString.append("Url");
         resultString.append("\t");
-        resultString.append(targetRequest.url());
+        resultString.append(targetReqRes.request().url());
         resultString.append("\n");
         resultString.append("Version");
         resultString.append("\t");
-        resultString.append(targetRequest.httpVersion());
+        resultString.append(targetReqRes.request().httpVersion());
         resultString.append("\n");
         resultString.append("\n");
     }
@@ -67,7 +72,7 @@ public class RequestParser {
     }
 
     private void parsePath(){
-        String path = targetRequest.path().split("\\?")[0];
+        String path = targetReqRes.request().path().split("\\?")[0];
         String[] pathSegments = path.split("/");
 
         Arrays.stream(pathSegments)
@@ -76,31 +81,28 @@ public class RequestParser {
     }
 
     private void parseQuery(){
-        targetRequest.parameters().stream()
+        targetReqRes.request().parameters().stream()
                 .filter((e) -> e.type() == HttpParameterType.URL)
                 .forEach(e -> addTableData(e.type().name(),e.name(),e.value()));
     }
 
     private void parseHeaders(){
-        targetRequest.headers().stream()
+        targetReqRes.request().headers().stream()
                 .filter((e)-> ! "Cookie".equalsIgnoreCase(e.name()))
                 .forEach(e -> addTableData("Header",e.name(),e.value()));
     }
 
     private void parseCookies(){
-        targetRequest.parameters().stream()
+        targetReqRes.request().parameters().stream()
                 .filter((e)-> (e.type() == HttpParameterType.COOKIE))
                 .forEach(e -> addTableData("Cookie",e.name(),e.value()));
     }
 
     private void parseRequestBody(){
-        var params = targetRequest.parameters();
-        for (HttpParameter param: params){
-            if(!(param.type() == HttpParameterType.URL ||
-                 param.type() == HttpParameterType.COOKIE)){
-                addTableData(param.type().name().toUpperCase(),param.name(),param.value());
-            }
-        }
+        targetReqRes.request().parameters().stream()
+                .filter((e)-> (e.type() != HttpParameterType.URL))
+                .filter((e)-> (e.type() != HttpParameterType.COOKIE))
+                .forEach(e -> addTableData(e.type().name(),e.name(),e.value()));
     }
 
     private void copyClipBoard(){

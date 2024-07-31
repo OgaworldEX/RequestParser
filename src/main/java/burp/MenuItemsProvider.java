@@ -41,7 +41,7 @@ public class MenuItemsProvider implements ContextMenuItemsProvider
 
     private void parseRequestAndCopyToClipboard(HttpRequestResponse httpRequestResponse) {
         //api.logging().logToOutput("start");
-        var requestParser = new RequestParser(api,httpRequestResponse.request());
+        var requestParser = new RequestParser(api,httpRequestResponse);
         requestParser.parseRequestAndCopyToClipboard();
     }
 }
