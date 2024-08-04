@@ -7,7 +7,7 @@ import burp.api.montoya.logging.Logging;
 public class OgaRequestParser implements BurpExtension
 {
     public final static String extensionName = "RequestParser";
-    public final static String version = "0.9.1";
+    public final static String version = "0.9.2";
 
     @Override
     public void initialize(MontoyaApi api)

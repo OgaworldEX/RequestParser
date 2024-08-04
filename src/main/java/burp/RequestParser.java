@@ -34,11 +34,6 @@ public class RequestParser {
     }
 
     private void parseBaseInfo(){
-        resultString.append("\t");
-        if (Objects.nonNull(targetReqRes.annotations().notes())){
-            resultString.append(targetReqRes.annotations().notes().replaceAll("[\n\r]", ""));
-        }
-        resultString.append("\n");
         resultString.append("Method");
         resultString.append("\t");
         resultString.append(targetReqRes.request().method());
@@ -51,6 +46,11 @@ public class RequestParser {
         resultString.append("\t");
         resultString.append(targetReqRes.request().httpVersion());
         resultString.append("\n");
+        resultString.append("Notes");
+        resultString.append("\t");
+        if (Objects.nonNull(targetReqRes.annotations().notes())){
+            resultString.append(targetReqRes.annotations().notes().replaceAll("[\n\r]", ""));
+        }
         resultString.append("\n");
     }
 
