@@ -1,12 +1,10 @@
-package burp;
+package burp.Parser;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.params.HttpParameterType;
 
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -20,9 +18,7 @@ public class RequestParser {
         this.api = api;
         this.targetReqRes = targetRequestResponse;
         resultString = new StringBuilder();
-    }
 
-    public void parseRequestAndCopyToClipboard() {
         parseBaseInfo();
         addRowName();
         parsePath();
@@ -30,7 +26,6 @@ public class RequestParser {
         parseHeaders();
         parseCookies();
         parseRequestBody();
-        copyClipBoard();
     }
 
     private void parseBaseInfo(){
@@ -105,9 +100,7 @@ public class RequestParser {
                 .forEach(e -> addTableData(e.type().name(),e.name(),e.value()));
     }
 
-    private void copyClipBoard(){
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection stringSelection = new StringSelection(resultString.toString());
-        clipboard.setContents(stringSelection,null);
+    public String getResultString() {
+        return resultString.toString();
     }
 }
