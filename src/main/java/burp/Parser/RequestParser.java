@@ -76,9 +76,15 @@ public class RequestParser {
     }
 
     private void parseQuery(){
+        String charset = getRequestCharset();
+
         targetReqRes.request().parameters().stream()
                 .filter((e) -> e.type() == HttpParameterType.URL)
-                .forEach(e -> addTableData(e.type().name(),e.name(),e.value()));
+                .forEach(e -> {
+                    String decodedName  = decodeValue(e.name(), charset);
+                    String decodedValue = decodeValue(e.value(), charset);
+                    addTableData(e.type().name(), decodedName, decodedValue);
+                });
     }
 
     private void parseHeaders(){
@@ -88,16 +94,51 @@ public class RequestParser {
     }
 
     private void parseCookies(){
+        String charset = getRequestCharset();
+
         targetReqRes.request().parameters().stream()
                 .filter((e)-> (e.type() == HttpParameterType.COOKIE))
-                .forEach(e -> addTableData("Cookie",e.name(),e.value()));
+                .forEach(e -> {
+                    String decodedName  = decodeValue(e.name(), charset);
+                    String decodedValue = decodeValue(e.value(), charset);
+                    addTableData("Cookie", decodedName, decodedValue);
+                });
     }
 
     private void parseRequestBody(){
+        String charset = getRequestCharset();
+
         targetReqRes.request().parameters().stream()
                 .filter((e)-> (e.type() != HttpParameterType.URL))
                 .filter((e)-> (e.type() != HttpParameterType.COOKIE))
-                .forEach(e -> addTableData(e.type().name(),e.name(),e.value()));
+                .forEach(e -> {
+                    String decodedName  = decodeValue(e.name(), charset);
+                    String decodedValue = decodeValue(e.value(), charset);
+                    addTableData(e.type().name(), decodedName, decodedValue);
+                });
+    }
+
+    private String getRequestCharset() {
+        return targetReqRes.request().headers().stream()
+                .filter(h -> h.name().equalsIgnoreCase("Content-Type"))
+                .map(h -> {
+                    String v = h.value().toLowerCase();
+                    int index = v.indexOf("charset=");
+                    if (index != -1) {
+                        return v.substring(index + "charset=".length()).trim();
+                    }
+                    return "utf-8";
+                })
+                .findFirst()
+                .orElse("utf-8");
+    }
+
+    private String decodeValue(String value, String charset) {
+        try {
+            return java.net.URLDecoder.decode(value, charset);
+        } catch (Exception e) {
+            return value; // デコード失敗時はそのまま
+        }
     }
 
     public String getResultString() {

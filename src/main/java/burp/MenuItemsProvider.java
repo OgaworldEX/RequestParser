@@ -68,8 +68,8 @@ public class MenuItemsProvider implements ContextMenuItemsProvider
         var responseParser = new ResponseParser(api,httpRequestResponse);
         sb.append((responseParser.getResultString()));
 
-        var setCookieParser = new SetCookieParser(api,httpRequestResponse);
-        sb.append((setCookieParser.getResultString()));
+        //var setCookieParser = new SetCookieParser(api,httpRequestResponse);
+        //sb.append((setCookieParser.getResultString()));
 
         copyToClipboard(sb.toString());
     }
