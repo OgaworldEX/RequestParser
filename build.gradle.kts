@@ -11,9 +11,9 @@ repositories {
 }
 
 dependencies {
-    implementation("net.portswigger.burp.extensions:montoya-api:2023.3")
+    compileOnly("net.portswigger.burp.extensions:montoya-api:2023.3")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
-    implementation("org.jsoup:jsoup:1.17.2")
+    //implementation("org.jsoup:jsoup:1.17.2")
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -26,14 +26,14 @@ tasks.test {
 // ShadowJar 設定
 tasks.shadowJar {
     archiveBaseName.set("RequestParser_vx.x.x")
-    archiveClassifier.set("")  // -all を消す
+    archiveClassifier.set("")
     archiveVersion.set("")
 
     mergeServiceFiles()
 
     manifest {
         attributes(
-            "Main-Class" to "burp.BurpExtender"  // Burp 拡張のエントリポイント
+            "Main-Class" to "burp.BurpExtender"
         )
     }
 }
